@@ -187,8 +187,7 @@ function Index() {
       <header className="site-header">
         <div className="site-header-inner">
           <a className="brand-lockup" href="#top" aria-label="Pack Labs by Curry Nation, home">
-            <span className="brand-name">Pack Labs</span>
-            <span className="brand-byline">BY CURRY NATION</span>
+            <img className="brand-mark" src="/pack-labs/pack-labs-logo.png" alt="Pack Labs by Curry Nation" />
           </a>
 
           <Button
@@ -286,7 +285,12 @@ function Index() {
 
           <div className="package-list">
             {packageTiers.map((tier) => (
-              <article className={`package-row package-row-${tier.id}`} key={tier.id} data-reveal>
+              <article
+                className={`package-row package-row-${tier.id}`}
+                id={`package-${tier.id}`}
+                key={tier.id}
+                data-reveal
+              >
                 <div className="package-copy">
                   <div className="package-meta">
                     <span>{tier.number} / {tier.name}</span>
@@ -445,8 +449,7 @@ function Index() {
 
       <footer className="site-footer">
         <a className="brand-lockup footer-brand" href="#top">
-          <span className="brand-name">Pack Labs</span>
-          <span className="brand-byline">BY CURRY NATION</span>
+          <img className="brand-mark" src="/pack-labs/pack-labs-logo.png" alt="Pack Labs by Curry Nation" />
         </a>
         <p>Brand-led packaging for what’s next.</p>
         <a href="mailto:hello@currynation.in">hello@currynation.in</a>
