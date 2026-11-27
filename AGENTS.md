@@ -31,3 +31,4 @@ use the editor.
 
 ## Pack Labs Landing Page
 - Keep Pack Labs package facts, timelines, and deliverables in `src/lib/pack-labs-packages.ts` so the page and its tests share one source.
+- Keep package selection and industry exploration on the existing home page so visitors can compare stages without leaving the landing-page flow.

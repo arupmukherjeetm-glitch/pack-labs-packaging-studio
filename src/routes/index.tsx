@@ -59,6 +59,51 @@ const fitQuestions: FitQuestion[] = [
   },
 ];
 
+const industryOptions = [
+  {
+    id: "beauty",
+    label: "Beauty and personal care",
+    title: "Make every product feel part of one ritual.",
+    summary:
+      "From a first launch to a broader range, give customers a clear way to recognise your brand across every product.",
+    image: "/pack-labs/product-packaging.jpg",
+    imageAlt: "A coordinated personal care packaging range",
+    stageId: "launch",
+  },
+  {
+    id: "wellness",
+    label: "Wellness and nutrition",
+    title: "Keep a growing range clear and connected.",
+    summary:
+      "Build a visual system that helps each product stand apart while keeping the full portfolio unmistakably yours.",
+    image: "/pack-labs/portfolio-growth.jpg",
+    imageAlt: "A growing product portfolio brought together as one system",
+    stageId: "grow",
+  },
+  {
+    id: "food",
+    label: "Food and beverage",
+    title: "Bring shelf presence and recognition together.",
+    summary:
+      "Create a consistent brand world that is easy to recognise across products, pack formats and future launches.",
+    image: "/pack-labs/packaging-stages.jpg",
+    imageAlt: "Packaging concepts arranged across product stages",
+    stageId: "launch",
+  },
+  {
+    id: "retail",
+    label: "Retail and e-commerce",
+    title: "Make the same brand feel considered in every channel.",
+    summary:
+      "Connect packaging and brand presentation across retail shelves, online stores and distributor channels.",
+    image: "/pack-labs/channel-rollout.jpg",
+    imageAlt: "A product brand prepared for retail, e-commerce and new markets",
+    stageId: "scale",
+  },
+] as const;
+
+type IndustryId = (typeof industryOptions)[number]["id"];
+
 function recommendPackage(answers: PackageId[]): PackageTier | null {
   const scores: Record<PackageId, number> = {
     start: 0,
@@ -110,6 +155,8 @@ function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [fitStep, setFitStep] = useState(0);
   const [fitAnswers, setFitAnswers] = useState<PackageId[]>([]);
+  const [activeTierId, setActiveTierId] = useState<PackageId>("start");
+  const [activeIndustryId, setActiveIndustryId] = useState<IndustryId>("beauty");
   const [formStatus, setFormStatus] = useState("");
 
   useEffect(() => {
@@ -140,11 +187,13 @@ function Index() {
   }, []);
 
   const currentQuestion = fitQuestions[fitStep];
-  if (!currentQuestion) return null;
-
   const selectedPackage = fitAnswers[fitStep];
   const fitComplete = fitAnswers.length === fitQuestions.length;
   const recommendation = fitComplete ? recommendPackage(fitAnswers) : null;
+  const activeTier = packageTiers.find(({ id }) => id === activeTierId);
+  const activeIndustry = industryOptions.find(({ id }) => id === activeIndustryId);
+
+  if (!currentQuestion || !activeTier || !activeIndustry) return null;
 
   function choosePackage(packageId: PackageId) {
     setFitAnswers((answers) => {
@@ -171,7 +220,7 @@ function Index() {
     const email = String(formData.get("email") ?? "");
     const company = String(formData.get("company") ?? "");
     const details = String(formData.get("details") ?? "");
-    const subject = encodeURIComponent(`Pack Labs enquiry — ${company || name}`);
+    const subject = encodeURIComponent(`Pack Labs enquiry: ${company || name}`);
     const body = encodeURIComponent(
       [`Name: ${name}`, `Email: ${email}`, `Company: ${company}`, `Project details: ${details}`].join(
         "\n\n",
@@ -227,7 +276,6 @@ function Index() {
       <main>
         <section className="hero-section" id="top">
           <div className="hero-copy">
-            <p className="eyebrow"><span className="eyebrow-rule" />Packaging for what’s next</p>
             <h1>
               Packaging that moves your product <span>forward.</span>
             </h1>
@@ -276,43 +324,109 @@ function Index() {
           </div>
         </section>
 
+        <section className="industries-section" aria-labelledby="industries-title" data-reveal>
+          <div className="industries-intro">
+            <p className="eyebrow"><span className="eyebrow-rule" />Packaging across product categories</p>
+            <h2 id="industries-title">Different products. A brand that holds together.</h2>
+            <p>
+              The right packaging system starts with how customers discover, choose and come back to
+              your product.
+            </p>
+          </div>
+
+          <div className="industry-explorer" aria-live="polite">
+            <div className="industry-tabs" role="group" aria-label="Explore product categories">
+              {industryOptions.map((industry, index) => (
+                <Button
+                  className={`industry-tab${activeIndustryId === industry.id ? " is-active" : ""}`}
+                  data-industry={industry.id}
+                  variant="outline"
+                  type="button"
+                  aria-pressed={activeIndustryId === industry.id}
+                  key={industry.id}
+                  onClick={() => setActiveIndustryId(industry.id)}
+                >
+                  <span className="industry-tab-index">0{index + 1}</span>
+                  <span>{industry.label}</span>
+                  <span className="industry-tab-arrow" aria-hidden="true">↗</span>
+                </Button>
+              ))}
+            </div>
+
+            <article className="industry-panel" key={activeIndustry.id}>
+              <div className="industry-art">
+                <img src={activeIndustry.image} alt={activeIndustry.imageAlt} loading="lazy" />
+              </div>
+              <div className="industry-copy">
+                <p className="industry-label">{activeIndustry.label}</p>
+                <h3>{activeIndustry.title}</h3>
+                <p>{activeIndustry.summary}</p>
+                <Button asChild size="lg">
+                  <a
+                    href="#packages"
+                    onClick={() => setActiveTierId(activeIndustry.stageId)}
+                  >
+                    Explore the right stage
+                  </a>
+                </Button>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section className="packages-section" id="packages">
           <div className="section-intro" data-reveal>
             <p className="eyebrow"><span className="eyebrow-rule" />Four ways forward</p>
             <h2>Choose the stage that fits your business today.</h2>
-            <p>Every package starts with what you need now—and leaves room for what comes next.</p>
+            <p>Every package starts with what you need now and leaves room for what comes next.</p>
           </div>
 
           <div className="package-list">
-            {packageTiers.map((tier) => (
+            <div className="package-tabs" role="group" aria-label="Choose a packaging stage" data-reveal>
+              {packageTiers.map((tier) => (
+                <Button
+                  className={`package-tab${activeTierId === tier.id ? " is-active" : ""}`}
+                  data-stage={tier.id}
+                  variant="outline"
+                  type="button"
+                  aria-pressed={activeTierId === tier.id}
+                  key={tier.id}
+                  onClick={() => setActiveTierId(tier.id)}
+                >
+                  <span className="package-tab-number">{tier.number}</span>
+                  <span className="package-tab-name">{tier.name}</span>
+                  <span className="package-tab-timeline">{tier.timeline}</span>
+                </Button>
+              ))}
+            </div>
+
               <article
-                className={`package-row package-row-${tier.id}`}
-                id={`package-${tier.id}`}
-                key={tier.id}
-                data-reveal
+                className={`package-stage package-stage-${activeTier.id}`}
+                id={`package-${activeTier.id}`}
+                key={activeTier.id}
+                aria-label={`${activeTier.name} package details`}
               >
                 <div className="package-copy">
                   <div className="package-meta">
-                    <span>{tier.number} / {tier.name}</span>
-                    <span>{tier.timeline}</span>
+                    <span>{activeTier.number} / {activeTier.name}</span>
+                    <span>{activeTier.timeline}</span>
                   </div>
-                  <h3>{tier.title}</h3>
-                  <p className="package-summary">{tier.summary}</p>
-                  <div className="deliverables-heading">{tier.scopeNote}</div>
+                  <h3>{activeTier.title}</h3>
+                  <p className="package-summary">{activeTier.summary}</p>
+                  <div className="deliverables-heading">{activeTier.scopeNote}</div>
                   <ul className="deliverables-list">
-                    {tier.deliverables.map((deliverable) => (
+                    {activeTier.deliverables.map((deliverable) => (
                       <li key={deliverable}>{deliverable}</li>
                     ))}
                   </ul>
                   <a className="text-link package-link" href="#contact">
-                    Talk about {tier.name} <span aria-hidden="true">↗</span>
+                    Talk about {activeTier.name} <span aria-hidden="true">↗</span>
                   </a>
                 </div>
                 <div className="package-art">
-                  <img src={tier.image} alt={tier.imageAlt} loading="lazy" />
+                  <img src={activeTier.image} alt={activeTier.imageAlt} loading="lazy" />
                 </div>
               </article>
-            ))}
           </div>
         </section>
 
@@ -329,7 +443,7 @@ function Index() {
             <h2>From first pack to a portfolio that holds together.</h2>
             <p>
               More products shouldn’t mean more visual noise. A clear packaging architecture helps
-              every product feel like part of the same story—on shelf, online and in new markets.
+              every product feel like part of the same story on shelf, online and in new markets.
             </p>
             <a className="text-link" href="#fit-check">
               Find the right starting point <span aria-hidden="true">↓</span>
@@ -367,7 +481,9 @@ function Index() {
                 <p>{recommendation.summary}</p>
                 <div className="fit-result-actions">
                   <Button asChild>
-                    <a href={`#package-${recommendation.id}`}>See this package</a>
+                    <a href="#packages" onClick={() => setActiveTierId(recommendation.id)}>
+                      See this package
+                    </a>
                   </Button>
                   <Button variant="outline" type="button" onClick={resetFitCheck}>
                     Start again
