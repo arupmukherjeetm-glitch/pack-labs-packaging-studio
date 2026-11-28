@@ -104,6 +104,39 @@ const industryOptions = [
 
 type IndustryId = (typeof industryOptions)[number]["id"];
 
+const momentOptions = [
+  {
+    id: "shelf",
+    kicker: "Shelf presence",
+    title: "Make a first impression count.",
+    summary: "Bring brand character and packaging structure together before launch.",
+    image: "/pack-labs/product-packaging.jpg",
+    imageAlt: "A coordinated personal care packaging range ready for launch",
+    stageId: "launch",
+    stageName: "Brand Launch",
+  },
+  {
+    id: "range",
+    kicker: "Range clarity",
+    title: "Make every product feel related.",
+    summary: "Give each SKU its own role while keeping the full family connected.",
+    image: "/pack-labs/portfolio-growth.jpg",
+    imageAlt: "Multiple product formats connected by one visual system",
+    stageId: "grow",
+    stageName: "Brand Grow",
+  },
+  {
+    id: "channel",
+    kicker: "Channel readiness",
+    title: "Carry the brand into new places.",
+    summary: "Keep packaging and brand presentation connected across channels.",
+    image: "/pack-labs/channel-rollout.jpg",
+    imageAlt: "Product packaging prepared for retail and new markets",
+    stageId: "scale",
+    stageName: "Brand Scale",
+  },
+] as const;
+
 function recommendPackage(answers: PackageId[]): PackageTier | null {
   const scores: Record<PackageId, number> = {
     start: 0,
@@ -324,6 +357,41 @@ function Index() {
           </div>
         </section>
 
+        <section className="moments-section" aria-labelledby="moments-title" data-reveal>
+          <div className="moments-heading">
+            <div>
+              <p className="eyebrow">Designed around real growth</p>
+              <h2 id="moments-title">Packaging with a role at every moment.</h2>
+            </div>
+            <p>
+              Create recognition, consistency and room to grow without losing the character of each
+              product.
+            </p>
+          </div>
+
+          <div className="moments-grid">
+            {momentOptions.map((moment, index) => (
+              <a
+                className="moment-card"
+                data-moment={moment.id}
+                href="#packages"
+                aria-label={`Explore ${moment.stageName}: ${moment.title}`}
+                key={moment.id}
+                onClick={() => setActiveTierId(moment.stageId)}
+              >
+                <img className="moment-image" src={moment.image} alt={moment.imageAlt} loading="lazy" />
+                <span className="moment-index">0{index + 1} / 03</span>
+                <div className="moment-content">
+                  <p className="moment-kicker">{moment.kicker}</p>
+                  <h3>{moment.title}</h3>
+                  <p>{moment.summary}</p>
+                  <span className="moment-link">Explore {moment.stageName} <span aria-hidden="true">↗</span></span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+
         <section className="industries-section" aria-labelledby="industries-title" data-reveal>
           <div className="industries-intro">
             <p className="eyebrow"><span className="eyebrow-rule" />Packaging across product categories</p>
@@ -449,6 +517,30 @@ function Index() {
               Find the right starting point <span aria-hidden="true">↓</span>
             </a>
           </div>
+        </section>
+
+        <section className="rollout-section" aria-labelledby="rollout-title" data-reveal>
+          <img
+            className="rollout-image"
+            src="/pack-labs/channel-rollout.jpg"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+          />
+          <div className="rollout-copy">
+            <p className="eyebrow">Beyond the first launch</p>
+            <h2 id="rollout-title">One brand, wherever it lands.</h2>
+            <p>
+              Bring packaging and brand presentation together across retail, e-commerce and
+              distributor channels.
+            </p>
+            <Button asChild size="lg">
+              <a href="#packages" onClick={() => setActiveTierId("scale")}>
+                Explore Brand Scale
+              </a>
+            </Button>
+          </div>
+          <span className="rollout-signature">PACK LABS <span aria-hidden="true">/</span> BRAND SCALE</span>
         </section>
 
         <section className="fit-section" id="fit-check" data-reveal>
